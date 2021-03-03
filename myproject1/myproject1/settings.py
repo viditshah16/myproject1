@@ -130,3 +130,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+#Added Manually: to specify url which we are going to use in views.py
+MEDIA_URL = '/media/'
+#Added Manually: to specify path for the media
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

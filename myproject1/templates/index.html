@@ -1,5 +1,8 @@
 {% load static %}
-<!doctype html>
+<!-- {% static "images" as baseUrl %} 
+	This is used when we used static content from views.py
+-->
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <!-- Required meta tags -->
@@ -120,19 +123,23 @@
 <br>
 <h2>Diagnostic Packages</h2>
 <div class="card-deck">
+{% for dp in dps %}
 <div class="card" style="width: 18rem;">
-  <img class="card-img-top" src="{% static "images/5.jfif" %}/" alt="Card image cap">
+  <img class="card-img-top" src="{{dp.img.url}}" alt="Card image cap">
   <div class="card-body">
-    <h5 class="card-title">Immunity Care Package</h5>
-    <p class="card-text">CBC (Complete Blood Count) | Kidney Health Profile
-Liver Health Profile | CRP (C-Reactive Protein)
-Iron Profile | Vitamin D Total - 25 OH Hydroxy
-ESR (Erythrocyte Sedimentation Rate) | Tele/Video Consultation</p>
-    <p class="font-weight-bold" style="color:red;"> For Rs. 799 </p>
+    <h5 class="card-title">{{dp.name}}</h5>
+    <p class="card-text">{{dp.desc}}</p>
+		<!--Immunity Care Package
+		CBC (Complete Blood Count) | Kidney Health Profile
+		Liver Health Profile | CRP (C-Reactive Protein)
+		Iron Profile | Vitamin D Total - 25 OH Hydroxy
+		ESR (Erythrocyte Sedimentation Rate) | Tele/Video Consultation-->
+    <p class="font-weight-bold" style="color:red;"> For Rs. {{dp.price}} </p>
     <a href="#" class="btn btn-primary">Book Now</a>
   </div>
 </div>
-<div class="card" style="width: 18rem;">
+{% endfor %}
+<!--<div class="card" style="width: 18rem;">
   <img class="card-img-top" src="{% static "images/6.jfif" %}" alt="Card image cap">
   <div class="card-body">
     <h5 class="card-title">Netmeds Shield Pack</h5>
@@ -158,26 +165,38 @@ ESR (Erythrocyte Sedimentation Rate) | Tele/Video Consultation</p>
     <p class="font-weight-bold" style="color:red;"> For Rs. 799 </p>
     <a href="#" class="btn btn-primary">Book Now</a>
   </div>
-</div>
+</div>-->
 </div>
 <br>
 
 
 <h4>Best Deals</h4>
 <div class="row row-cols-1 row-cols-md-6 g-6">
+  {% for bd in bds %}
   <div class="col">
     <div class="card h-100">
-    <span class="badge bg-info text-dark">20% off</span>
-      <img src="{% static "images/11.jfif" %}" class="card-img-top" alt="...">
+	{% if bd.offer != 0 %}
+    <span class="badge bg-info text-dark">{{bd.offer}}% off</span> 
+	{% endif %}
+      <img src="{{bd.img.url}}" class="card-img-top" alt="...">
       <div class="card-body">
-        <h5 class="card-title">VLCC 3D Youth Boost SPF 40 Sunscreen Gel Creme 100 gm Personal Care Skin Care</h5>
-        <p class="card-text">Mfr: Vlcc Health Care Ltd</p>
-        <span class="price-box"> <strike id="price">Rs.395.00</strike> <span id="final_price" style="color:red">Rs.316.00</span> </span>
-        <button type="button" class="btn btn-primary">Add to Cart</button>
+        <h5 class="card-title">{{bd.name}}</h5>
+		<p class="card-text">Description: {{bd.desc}}</p>
+        <p class="card-text">Manufacturer: {{bd.mfr}}</p>
+		{% if bd.offer == 0 %}
+		<span class="price-box"> Rs.{{bd.price}}</span><br>
+		{% else %}
+        <span class="price-box"> <strike id="price">Rs.{{bd.price}}</strike> 
+		<span id="final_price" style="color:red">Rs.{{bd.offer_price}}</span> </span>
+		{% endif %}
+		<button type="button" class="btn btn-primary">Buy now</button><br><br>
+		<button type="button" class="btn btn-primary">Add to Cart</button>
+        
       </div>
     </div>
   </div>
-  <div class="col">
+  {% endfor %}
+  <!-- <div class="col">
     <div class="card h-100">
     <span class="badge bg-info text-dark">12% off</span>
       <img src="{% static "images/12.jfif" %}" class="card-img-top" alt="...">
@@ -236,7 +255,7 @@ ESR (Erythrocyte Sedimentation Rate) | Tele/Video Consultation</p>
         <button type="button" class="btn btn-primary">Add to Cart</button>
       </div>
     </div>
-  </div>
+  </div> -->
 </div>
 
     <!-- Optional JavaScript -->
