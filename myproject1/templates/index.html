@@ -5,6 +5,31 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+  <style>
+  #cart-icon{
+	width:25px;
+	display: inline-block;
+	margin-left: 15px;
+  }
+
+  #cart-total{
+	display: block;
+	text-align: center;
+	color:#fff;
+	background-color: red;
+	width: 20px;
+	height: 25px;
+	border-radius: 50%;
+	font-size: 14px;
+  }
+  <!-- .cart-row{ -->
+	<!-- display: flex; -->
+    <!-- align-items: flex-stretch; -->
+    <!-- padding-bottom: 10px; -->
+    <!-- margin-bottom: 10px; -->
+    <!-- border-bottom: 1px solid #ececec; -->
+  <!-- } -->
+  </style>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -40,6 +65,7 @@
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
           <a class="dropdown-item" href="#">Health Library</a>
           <a class="dropdown-item" href="#">Cororna Awarness</a>
+		</div>
       </li>
     <form class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
@@ -50,6 +76,16 @@
 		<li style="color:white;"> Hello, {{user.first_name }} {{user.last_name}}</li>
         <a class="nav-link" href="accounts/logout">Logout<span class="sr-only">(current)</span></a>
       </li>
+	  <!-- <li class="nav-item active"> -->
+		<!-- <p id="cart-total">0</p> -->
+        <!-- <a class="nav-link" href="cart.html"><img id="cart-icon" src="{% static 'images/cart.png' %}" /><span class="sr-only">(current)</span></a> -->
+      <!-- </li> -->
+	  <div class="form-inline my-2 my-lg-0">
+        <a href="{% url 'cart' %}">
+          <img  id="cart-icon" src="{% static 'images/cart.png' %}">
+        </a>
+      <p id="cart-total">0</p>
+	  </div>
 	  {% else %}
 	  <li class="nav-item active">
         <a class="nav-link" href="accounts/login">Login<span class="sr-only">(current)</span></a>
@@ -60,7 +96,7 @@
 	  {% endif %}
       </ul>
     </form>
-  </div>
+ </div>
 </nav>
 
 

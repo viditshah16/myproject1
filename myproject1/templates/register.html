@@ -29,7 +29,7 @@
 			<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 				<!-- Bootstrap CSS -->
 				<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-					<title>Login to HealthOCare</title>
+					<title>Registration Page: HealthOCare</title>
 						<!-- Custom styles for this template -->
 						<style>
 							html,body {
@@ -54,6 +54,11 @@
 							  max-width: 330px;
 							  padding: 15px;
 							  margin: auto;
+							}
+							
+							.error-messages{
+							  color: red;
+							  padding: 15px;
 							}
 							
 							.form-signin .form-control {
@@ -107,16 +112,16 @@
 						<form action="register" method="post" class="form-signin"> 
 							{% csrf_token %} 
 							<a href="/index"><h1 class="h3 mb-3 font-weight-normal">HEALTHOCARE</h1></a>
-							<input name="first_name" placeholder="First Name" type="text" class="form-control">
-							<input name="last_name" placeholder="Last Name" type="text" class="form-control">
-							<input name="username" placeholder="User Name" type="text" class="form-control">
-							<input name="email" placeholder="Email" type="email" class="form-control">
-							<input name="password1" placeholder="Password" type="password" class="form-control">
-							<input name="password2" placeholder="Confirm Password" type="password" class="form-control"><br>
-							<input value="Submit" type="submit" class="btn btn-lg btn-primary btn-block">
+							<input required autofocus name="first_name" placeholder="First Name" type="text" class="form-control">
+							<input required name="last_name" placeholder="Last Name" type="text" class="form-control">
+							<input required name="username" placeholder="User Name" type="text" class="form-control">
+							<input required name="email" placeholder="Email" type="email" class="form-control">
+							<input required name="password1" placeholder="Password" type="password" class="form-control">
+							<input required name="password2" placeholder="Confirm Password" type="password" class="form-control"><br>
+							<input required value="Submit" type="submit" class="btn btn-lg btn-primary btn-block">
 							<p class="mt-5 mb-3">&copy;HEALTHOCARE 2020-2021</p>
 						</form>
-						<div>
+						<div class="error-messages">
 							{% for message in messages %}
 							<h3>{{message}}</h3>
 							{% endfor %}
