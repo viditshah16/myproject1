@@ -110,15 +110,44 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	
+	<script type="text/javascript">
+		var user = '{{request.user}}'
+		<!-- first we want to query the users to check his status. -->
+		<!-- here i have created a script tag and set the variable of user to request.user. -->
+		<!-- if the user is not logged in the value will be AnonymousUser -->
+		
+		<!-- reference how to acquire token : https://docs.djangoproject.com/en/3.1/ref/csrf/ -->
+		function getToken(name) {
+			let cookieValue = null;
+			if (document.cookie && document.cookie !== '') {
+				const cookies = document.cookie.split(';');
+				for (let i = 0; i < cookies.length; i++) {
+					const cookie = cookies[i].trim();
+					
+					if (cookie.substring(0, name.length + 1) === (name + '=')) {
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+						break;
+					}
+				}
+			}
+			return cookieValue;
+		}
+		const csrftoken = getToken('csrftoken');
+	</script>
 </head>
 <body>
-
+	
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/index">HEALTHOCARE</a>
 	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	  </button>
+	  <div class="form-inline my-2 my-lg-0" style="margin-left:auto">
+        <a href="{% url 'cart' %}">
+          <img  id="cart-icon" src="{% static 'images/cart.png' %}">
+        </a>
+      <p id="cart-total">{{cartItems}}</p>
+	  </div>
 	</nav>
   
 	<div class="row">
@@ -129,8 +158,8 @@
 				<br>
 				<table class="table">
 					<tr>
-						<th><h5>Items: <strong>2</strong></h5></th>
-						<th><h5>Total: <strong>Rs. 1446</strong></h5></th>
+						<th><h5>Items: <strong>{{order.get_cart_items}}</strong></h5></th>
+						<th><h5>Total: <strong>Rs. {{order.get_cart_total|floatformat:2}}</strong></h5></th>
 						<th>
 							<a  style="float:right; margin:5px;" class="btn btn-success" href="{% url 'checkout' %}">Checkout</a>
 						</th>
@@ -146,23 +175,28 @@
 					<div style="flex:1"><strong>Total</strong></div>
 				</div>
 				
+				{% for item in items %}
 				<div class="cart-row">
-					<div style="flex:2"><img class="row-image" src="{% static 'images/16.png' %}"></div>
-					<div style="flex:2"><p>Zenith Nutrition Probiotic Immune Capsules 90's</p></div>
-					<div style="flex:1"><p>Rs. 723</p></div>
+					<div style="flex:2"><img class="row-image" src="{{item.product.img.url}}"></div>
+					<div style="flex:2"><p>{{item.product.name}}</p></div>
+					<div style="flex:1"><p>Rs. {{item.product.offer_price|floatformat:2}}</p></div>  
+					<!-- floatformat:2 is used to indicate 2 decimal points  -->
 					<div style="flex:1">
-						<p class="quantity">2</p>
+						<p class="quantity">{{item.quantity}}</p>
 						<div class="quantity">
-							<img class="chg-quantity" src="{% static  'images/arrow-up.png' %}">
+							<img data-product={{item.product.id}} data-action="add" class="chg-quantity update-cart" src="{% static  'images/arrow-up.png' %}">
 					
-							<img class="chg-quantity" src="{% static  'images/arrow-down.png' %}">
+							<img data-product={{item.product.id}} data-action="remove" class="chg-quantity update-cart" src="{% static  'images/arrow-down.png' %}">
 						</div>
 					</div>
-					<div style="flex:1"><p>Rs. 1446</p></div>
+					<div style="flex:1"><p>Rs. {{item.get_total|floatformat:2}}</p></div>
 				</div>
+				{% endfor %}
 			</div>
 		</div>
 	</div>
-
+	
+	<script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
+	
 </body>
 </html>

@@ -110,21 +110,51 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	
+	<script type="text/javascript">
+		var user = '{{request.user}}'
+		<!-- first we want to query the users to check his status. -->
+		<!-- here i have created a script tag and set the variable of user to request.user. -->
+		<!-- if the user is not logged in the value will be AnonymousUser -->
+		
+		<!-- reference how to acquire token : https://docs.djangoproject.com/en/3.1/ref/csrf/ -->
+		function getToken(name) {
+			let cookieValue = null;
+			if (document.cookie && document.cookie !== '') {
+				const cookies = document.cookie.split(';');
+				for (let i = 0; i < cookies.length; i++) {
+					const cookie = cookies[i].trim();
+					
+					if (cookie.substring(0, name.length + 1) === (name + '=')) {
+						cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+						break;
+					}
+				}
+			}
+			return cookieValue;
+		}
+		const csrftoken = getToken('csrftoken');
+	</script>
 </head>
 <body>
-
+	
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	  <a class="navbar-brand" href="/index">HEALTHOCARE</a>
 	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	  </button>
+	  <div class="form-inline my-2 my-lg-0" style="margin-left:auto">
+        <a href="{% url 'cart' %}">
+          <img  id="cart-icon" src="{% static 'images/cart.png' %}">
+        </a>
+      <p id="cart-total">{{cartItems}}</p>
+	  </div>
 	</nav>
 	
 	<div class="row">
 		<div class="col-lg-6">
 			<div class="box-element" id="form-wrapper">
 				<form id="form">
+					<!-- {% csrf_token %} -->
 					<div id="user-info">
 						<div class="form-field">
 							<input required class="form-control" type="text" name="name" placeholder="Name">
@@ -151,17 +181,18 @@
 							<input required class="form-control" type="text" name="country" placeholder="Country">
 						</div>
 						<div class="form-field">
-							<input required class="form-control" type="text" name="zip code" placeholder="Zip code">
+							<input required class="form-control" type="text" name="zip_code" placeholder="Zip code">
 						</div>
 					</div>
 					
 					<hr>
-					<input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
+					<input id="form-button" class="btn btn-success btn-block" type="submit" name="submit" value="Continue">
 				</form>
 			</div>
 			<br>
 			<div class="box-element hidden" id="payment-info">
-				<small>Paypal Options</small>
+				<small>Payment Options</small>
+				<button id="make-payment">Make Payment</button>
 			</div>
 		</div>
 		
@@ -172,17 +203,118 @@
 					<hr>
 					<h3>Order Summary</h3>
 					<hr>
+					{% for item in items %}
 					<div class="cart-row">
-						<div style="flex:2"><img class="row-image" src="{% static 'images/16.png' %}"></div>
-						<div style="flex:2"><p>Zenith Nutrition Probiotic Immune Capsules 90's</p></div>
-						<div style="flex:1"><p>Rs. 723.00</p></div>
-						<div style="flex:1"><p>x2</p></div>
+						<div style="flex:2"><img class="row-image" src="{{item.product.img.url}}"></div>
+						<div style="flex:2"><p>{{item.product.name}}</p></div>
+						<div style="flex:1"><p>Rs. {{item.product.offer_price|floatformat:2}}</p></div>
+						<div style="flex:1"><p>x{{item.quantity}}</p></div>
+						<div style="flex:1"><p>Rs. {{item.get_total|floatformat:2}}</p></div>
 					</div>
-					<h5>Items:   2</h5>
-					<h5>Total:   Rs. 1446</h5>
+					{% endfor %}
+					<h5>Items:   {{order.get_cart_items}}</h5>
+					<h5>Total:   Rs. {{order.get_cart_total|floatformat:2}}</h5>
 				</div>
 			</div>
 		</div>
 	</div>
+	
+	<script type="text/javascript" src="{% static 'js/cart.js' %}"></script>
+	<script type="text/javascript">
+	
+		var shipping = '{{order.shipping}}'
+	
+		var total = '{{order.get_cart_total}}'
+	
+		if(shipping == 'False'){
+			document.getElementById('shipping-info').innerHTML = ''
+		}
+		
+		if(user != 'AnonymousUser'){ 
+			//here we are hidding user-info form if the user is logged in already and showing only shipping information form
+			document.getElementById('user-info').innerHTML = ''
+		}
+		
+		var form = document.getElementById('form')
+		
+		<!-- csrftoken = form.getElementByTagName("input")[0].value -->
+		<!-- console.log('NewToken:', form.getElementByTagName("input")[0].value) -->
+		
+		form.addEventListener('submit',function(e){
+			e.preventDefault()
+			console.log('Shipping information form Submitted')
+			document.getElementById('form-button').classList.add("hidden") 
+			<!-- here we are hidding Continue button from form -->
+			document.getElementById('payment-info').classList.remove("hidden")
+			<!-- and here we are adding payment button -->
+		})
+		
+		document.getElementById('make-payment').addEventListener('click', function(e){
+			submitFormData()
+		})
+		
+		function submitFormData(){
+			console.log('Payment button clicked')
+			
+			var userInfo = { // initial values once the form is submitted the value will change
+				'name':null,
+				'email':null,
+				'total':null
+			}
+			
+			var shippingInfo = { // initial values once the form is submitted the value will change
+				'address':null,
+				'city':null,
+				'state':null,
+				'country':null,
+				'zip_code':null
+			}
+			
+			if(shipping != 'False'){ // if shipping is 'True' then update the shippingInfo
+				userInfo.total = total
+				shippingInfo.address = form.address.value
+				shippingInfo.city = form.city.value
+				shippingInfo.state = form.state.value
+				shippingInfo.country = form.country.value
+				shippingInfo.zip_code = form.zip_code.value
+			}
+			
+			if(user == 'AnonymousUser'){
+				userInfo.name = form.name.value
+				userInfo.email = form.email.value
+			}
+			
+			var url = 'http://127.0.0.1:8000/index/process_order/'
+			fetch(url, {
+				method:'POST',
+				headers:{
+					'Content-Type':'application/json',
+					'X-CSRFToken':csrftoken,
+				},
+				body:JSON.stringify({'form': userInfo, 'shipping': shippingInfo}) 
+				// this data is send to backend i.e., to views.py
+				// as we want to send this data as string we have used stringify
+			})
+			.then((response) => { 
+			// Once the date is sent we return a Promise. To return a promise this
+			// is the response that we get after we send the data to this view i.e., updateItem 
+				if (!response.ok){
+					// error processing
+					throw 'Error';
+				}
+				return response.json();
+			})
+			// now after we have sent the data to the view and it is processed and everything 
+			// went right we want to return this response i.e., 'Payment complete!' as a Promise
+			// to fetch
+			.then((data) => { // Promise
+				console.log('success:', data)
+				alert('Transaction completed')
+				window.location.href = "{% url 'index' %}" // after clicking ok to alert user will be redirected back to home page
+			})
+			
+		}
+		
+	</script>
 </body>
 </html>
