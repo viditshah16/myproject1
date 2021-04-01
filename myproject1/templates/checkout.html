@@ -191,8 +191,8 @@
 			</div>
 			<br>
 			<div class="box-element hidden" id="payment-info">
-				<small>Payment Options</small>
-				<button id="make-payment">Make Payment</button>
+				<!-- <small>Payment Options</small> -->
+				<button id="make-payment" class="btn btn-success btn-block">Make Payment</button>
 			</div>
 		</div>
 		
@@ -310,7 +310,7 @@
 			.then((data) => { // Promise
 				console.log('success:', data)
 				alert('Transaction completed')
-				window.location.href = "{% url 'index' %}" // after clicking ok to alert user will be redirected back to home page
+				window.location.href = "{% url 'payment_success' %}" // after clicking ok to alert user will be redirected back to payment_success page
 			})
 			
 		}

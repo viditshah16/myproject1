@@ -110,16 +110,21 @@ def updateItem(request): # updateItem function
     # i don't want to create a newone i will just change the quantity of it so we can add or subtract
     
     if action == 'add': # if action is add then add an item
+        msg = 'Item was added'
         orderItem.quantity = (orderItem.quantity + 1)
     elif action == 'remove': # else if action is remove then remove an item
+        msg = 'Item was removed'
         orderItem.quantity = (orderItem.quantity - 1)
     
     orderItem.save() # and then save it
     
     if orderItem.quantity <= 0: # if item quantity is less than or equal to zero then delete an item from the cart
         orderItem.delete()
-    
-    return JsonResponse('Item was added', safe=False)
+        
+    if action == 'add':
+        return JsonResponse(msg, safe=False)
+    elif action == 'remove':
+        return JsonResponse(msg, safe=False)
     # If safe is set to False any object can be passed for serialization otherwise only dict instances are allowed.
 
 def processOrder(request):
@@ -154,3 +159,6 @@ def processOrder(request):
     else:
         print("user is not logged in")
     return JsonResponse('Payment complete!', safe=False)
+    
+def payment_success(request):
+    return render(request, 'payment_success.html')

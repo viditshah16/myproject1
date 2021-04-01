@@ -49,7 +49,12 @@ function updateUserOrder(productId, action){
 	// to fetch
 	.then((data) => { // Promise
 		console.log('data:', data)
-		alert('Item was added')
+		if (action == 'add'){
+			alert('Item was added')
+		}
+		if (action == 'remove'){
+			alert('Item was removed')
+		}
 		location.reload() // to reload the page automatically
 	})
 }
